@@ -74,7 +74,7 @@ void buat_dungeon() {
     }
 
     struct Dungeon d;
-    while (getchar() != '\n'); // flush newline
+    while (getchar() != '\n');
     printf("Nama Dungeon: ");
     scanf("%[^\n]", d.name);
 
