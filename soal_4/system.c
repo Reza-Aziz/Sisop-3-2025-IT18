@@ -77,8 +77,10 @@ void buat_dungeon() {
     while (getchar() != '\n');
     printf("Nama Dungeon: ");
     scanf("%[^\n]", d.name);
-
-    d.min_level = (rand() % 5) + 1;
+    
+    printf("Minimum Level: ");
+    scanf("%d", &d.min_level);
+    
     d.exp       = (rand() % 151) + 150;
     d.atk       = (rand() % 51) + 100;
     d.hp        = (rand() % 51) + 50;
