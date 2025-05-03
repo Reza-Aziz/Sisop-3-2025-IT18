@@ -48,11 +48,12 @@ key_t get_system_key() {
 
 struct SystemData *system_data;
 int current_hunter_index = -1;
+int show_notification = -1;
 
 void *notification_thread(void *arg) {
-    int last_index = system_data->current_notification_index;
+    int last_index = 1;
     while (1) {
-        if (system_data->current_notification_index != last_index) {
+        if (show_notification && system_data->current_notification_index != last_index) {
             printf("\n[Notifikasi] %s\n", system_data->notifications[system_data->current_notification_index]);
             last_index = system_data->current_notification_index;
         }
@@ -67,90 +68,87 @@ void register_hunter() {
         return;
     }
 
-    struct Hunter new_hunter;
+    struct Hunter h;
     printf("Masukkan username: ");
-    scanf("%s", new_hunter.username);
+    scanf("%s", h.username);
 
-    new_hunter.level = 1;
-    new_hunter.exp = 0;
-    new_hunter.atk = 10;
-    new_hunter.hp = 100;
-    new_hunter.def = 5;
-    new_hunter.banned = 0;
+    h.level = 1;
+    h.exp = 0;
+    h.atk = 10;
+    h.hp = 100;
+    h.def = 5;
+    h.banned = 0;
 
-    system_data->hunters[system_data->num_hunters++] = new_hunter;
-    printf("Hunter berhasil diregistrasi.\n");
+    system_data->hunters[system_data->num_hunters++] = h;
+    printf("Registrasi berhasil.\n");
 }
 
-int login() {
-    char uname[MAX_USERNAME];
+int login_hunter() {
+    char name[MAX_USERNAME];
     printf("Masukkan username: ");
-    scanf("%s", uname);
-
+    scanf("%s", name);
     for (int i = 0; i < system_data->num_hunters; i++) {
-        if (strcmp(system_data->hunters[i].username, uname) == 0) {
+        if (strcmp(system_data->hunters[i].username, name) == 0) {
             if (system_data->hunters[i].banned) {
-                printf("Hunter anda dibanned.\n");
+                printf("Hunter dibanned!\n");
                 return -1;
             }
             current_hunter_index = i;
+            printf("Login berhasil sebagai %s\n", name);
             return i;
         }
     }
-
-    printf("Username tidak ditemukan.\n");
+    printf("Username tidak ditemukan!\n");
     return -1;
 }
 
-void list_dungeons() {
+void lihat_dungeon() {
     printf("\n=== Daftar Dungeon ===\n");
     struct Hunter *h = &system_data->hunters[current_hunter_index];
     for (int i = 0; i < system_data->num_dungeons; i++) {
         struct Dungeon d = system_data->dungeons[i];
         if (h->level >= d.min_level) {
-            printf("%d. %s | Min Level: %d | EXP: %d | ATK: %d | HP: %d | DEF: %d\n",
-                   i+1, d.name, d.min_level, d.exp, d.atk, d.hp, d.def);
+            printf("%d. %s (Min Lv %d, EXP %d, ATK %d, HP %d, DEF %d)\n",
+                i+1, d.name, d.min_level, d.exp, d.atk, d.hp, d.def);
         }
     }
 }
 
 void raid_dungeon() {
-    list_dungeons();
-    printf("Pilih nomor dungeon: ");
-    int idx;
-    scanf("%d", &idx);
-    idx--;
+    lihat_dungeon();
+    printf("Pilih dungeon: ");
+    int pilih;
+    scanf("%d", &pilih);
+    pilih--;
 
-    if (idx < 0 || idx >= system_data->num_dungeons) {
+    if (pilih < 0 || pilih >= system_data->num_dungeons) {
         printf("Pilihan tidak valid.\n");
         return;
     }
 
     struct Hunter *h = &system_data->hunters[current_hunter_index];
-    struct Dungeon *d = &system_data->dungeons[idx];
+    struct Dungeon *d = &system_data->dungeons[pilih];
 
     if (h->level < d->min_level) {
-        printf("Level anda belum cukup!\n");
+        printf("Level belum cukup!\n");
         return;
     }
 
-    int damage_to_monster = h->atk - d->def;
-    int damage_to_player = d->atk - h->def;
-
-    if (damage_to_monster <= 0) damage_to_monster = 1;
-    if (damage_to_player <= 0) damage_to_player = 1;
-
     int monster_hp = d->hp;
     int player_hp = h->hp;
+    int dmg_to_monster = h->atk - d->def;
+    int dmg_to_player = d->atk - h->def;
+    if (dmg_to_monster <= 0) dmg_to_monster = 1;
+    if (dmg_to_player <= 0) dmg_to_player = 1;
 
     while (monster_hp > 0 && player_hp > 0) {
-        monster_hp -= damage_to_monster;
+        monster_hp -= dmg_to_monster;
         if (monster_hp <= 0) break;
-        player_hp -= damage_to_player;
+        player_hp -= dmg_to_player;
     }
 
     if (monster_hp <= 0 && player_hp > 0) {
-        printf("Kamu menang! EXP +%d\n", d->exp);
+        printf("Menang! Dapat EXP %d\n", d->exp);
         h->exp += d->exp;
         while (h->exp >= 500) {
             h->level++;
@@ -158,59 +156,55 @@ void raid_dungeon() {
             h->atk += 10;
             h->hp += 10;
             h->def += 10;
-            printf("Naik level! Level sekarang: %d\n", h->level);
+            printf("Naik level! Level: %d\n", h->level);
         }
-    } else {
-        printf("Kamu kalah!\n");
+     } else {
+        printf("Kalah!\n");
     }
 }
 
 void battle_hunter() {
-    printf("\n=== Daftar Hunter ===\n");
+    printf("\n=== Pilih Lawan ===\n");
     for (int i = 0; i < system_data->num_hunters; i++) {
         if (i != current_hunter_index && !system_data->hunters[i].banned) {
             printf("%d. %s\n", i+1, system_data->hunters[i].username);
         }
     }
 
-    printf("Pilih nomor hunter lawan: ");
+    printf("Pilih lawan: ");
     int idx;
     scanf("%d", &idx);
     idx--;
 
     if (idx < 0 || idx >= system_data->num_hunters || idx == current_hunter_index) {
-        printf("Pilihan tidak valid.\n");
+        printf("Pilihan tidak valid!\n");
         return;
     }
 
-    struct Hunter *player = &system_data->hunters[current_hunter_index];
-    struct Hunter *enemy = &system_data->hunters[idx];
+    struct Hunter *p = &system_data->hunters[current_hunter_index];
+    struct Hunter *e = &system_data->hunters[idx];
 
-    int damage_to_enemy = player->atk - enemy->def;
-    int damage_to_player = enemy->atk - player->def;
+    int p_hp = p->hp, e_hp = e->hp;
+    int p_dmg = p->atk - e->def, e_dmg = e->atk - p->def;
+    if (p_dmg <= 0) p_dmg = 1;
+    if (e_dmg <= 0) e_dmg = 1;
 
-    if (damage_to_enemy <= 0) damage_to_enemy = 1;
-    if (damage_to_player <= 0) damage_to_player = 1;
-
-    int player_hp = player->hp;
-    int enemy_hp = enemy->hp;
-
-    while (player_hp > 0 && enemy_hp > 0) {
-        enemy_hp -= damage_to_enemy;
-        if (enemy_hp <= 0) break;
-        player_hp -= damage_to_player;
+    while (p_hp > 0 && e_hp > 0) {
+        e_hp -= p_dmg;
+        if (e_hp <= 0) break;
+        p_hp -= e_dmg;
     }
 
-    if (player_hp > 0 && enemy_hp <= 0) {
+    if (p_hp > 0 && e_hp <= 0) {
         printf("Kamu menang! EXP +50\n");
-        player->exp += 50;
-        while (player->exp >= 500) {
-            player->level++;
-            player->exp -= 500;
-            player->atk += 10;
-            player->hp += 10;
-            player->def += 10;
-            printf("Naik level! Level sekarang: %d\n", player->level);
+        p->exp += 50;
+        while (p->exp >= 500) {
+            p->level++;
+            p->exp -= 500;
+            p->atk += 10;
+            p->hp += 10;
+            p->def += 10;
+            printf("Naik level! Level: %d\n", p->level);
         }
     } else {
         printf("Kamu kalah!\n");
@@ -222,38 +216,62 @@ int main() {
     int shmid = shmget(key, sizeof(struct SystemData), 0666);
     if (shmid == -1) {
         perror("shmget");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
-    system_data = (struct SystemData *) shmat(shmid, NULL, 0);
+    system_data = shmat(shmid, NULL, 0);
     if (system_data == (void *) -1) {
         perror("shmat");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
-    pthread_t notif_thread;
-    pthread_create(&notif_thread, NULL, notification_thread, NULL);
+    pthread_t tid;
+    int  notif_started = 0;
 
-    int choice;
+    int awal;
     do {
-        printf("\n=== Menu Hunter ===\n");
+        printf("\n=== Menu Awal ===\n");
         printf("1. Register\n");
         printf("2. Login\n");
-        printf("3. Lihat Dungeon\n");
-        printf("4. Raid Dungeon\n");
-        printf("5. Battle\n");
-        printf("6. Exit\n");
+        printf("3. Exit\n");
         printf("Pilihan: ");
-        scanf("%d", &choice);
+        scanf("%d", &awal);
 
-        if (choice == 1) register_hunter();
-        else if (choice == 2) login();
-        else if (choice == 3 && current_hunter_index != -1) list_dungeons();
-        else if (choice == 4 && current_hunter_index != -1) raid_dungeon();
-        else if (choice == 5 && current_hunter_index != -1) battle_hunter();
-        else if (choice == 6) break;
-        else printf("Silakan login terlebih dahulu.\n");
-    } while (1);
+        if (awal == 1) register_hunter();
+        else if (awal == 2) {
+            if (login_hunter() != -1) {
+                if(!notif_started) {
+                   pthread_create(&tid, NULL, notification_thread, NULL);
+                   notif_started = 1;
+                }
+
+                int menu;
+                do {
+                    printf("\n=== Menu Utama ===\n");
+                    printf("1. Lihat Dungeon\n");
+                    printf("2. Raid Dungeon\n");
+                    printf("3. Battle\n");
+                    printf("4. Notifikasi\n");
+                    printf("5. Logout\n");
+                    printf("Pilihan: ");
+                    scanf("%d", &menu);
+
+                    if (menu == 1) lihat_dungeon();
+                    else if (menu == 2) raid_dungeon();
+                    else if (menu == 3) battle_hunter();
+                    else if (menu == 4) {
+                        show_notification = !show_notification;
+                        printf("Notifikasi %s\n", show_notification ? "diaktifkan" : "dimatikan");
+                    }
+                    else if (menu == 5) {
+                        current_hunter_index = -1;
+                        break;
+
+                    }
+                } while (1);
+            }
+        }
+    } while (awal != 3);
 
     return 0;
 }
