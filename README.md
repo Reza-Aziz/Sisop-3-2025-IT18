@@ -61,9 +61,61 @@ void log_action(const char *msg) {
         if (n < BUF_SIZE) break;
     }
     fclose(fp);
+               
+    char jpgpath[512];
+    snprintf(jpgpath, sizeof(jpgpath), "%s%s.jpg", SAVE_DIR, filename);
+    char cmd[1024];
+    snprintf(cmd, sizeof(cmd), "convert %s %s", path, jpgpath);
+    system(cmd);
+    snprintf(logmsg, sizeof(logmsg), "CONVERTED %s.jpg", filename);
+    log_action(logmsg);
+    remove(path);
+
+    char resp[128];
+    snprintf(resp, sizeof(resp), "Text decrypted and saved as %s.jpg", filename);
+    write(client_fd, resp, strlen(resp));
+    close(client_fd);
+}
                </pre>
+* Menerima nama file dari client
+* Mencatat aktivitas penerimaan file ke log
+* Membuat direktori penyimpanan jika belum ada
+* Menerima isi file dari client dan menyimpannya
+* Mengkonversi file yang diterima ke format JPG menggunakan perintah convert (ImageMagick)
+* Mencatat aktivitas konversi ke log
+* Menghapus file asli setelah dikonversi
+* Mengirim respon ke client bahwa file telah dikonversi
+* Menutup koneksi client
 
+5. Int Main()
+<pre>
+ int main() {
+    daemonize();
+    mkdir(SAVE_DIR, 0755);
+    int lf = open(LOG_FILE, O_CREAT|O_APPEND, 0644);
+    if (lf>=0) close(lf);
+    log_action("SERVER STARTED");
 
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    struct sockaddr_in addr = {0};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = htons(PORT);
+    bind(sock, (struct sockaddr*)&addr, sizeof(addr));
+    listen(sock, 5);
+
+    while (1) {
+        int cfd = accept(sock, NULL, NULL);
+        if (cfd<0) continue;
+        if (!fork()) {
+            receive_and_convert(cfd);
+            exit(0);
+        }
+        close(cfd);
+    }
+    return 0;
+}
+         </pre>
 
 # Soal 2
 delivery_agent
