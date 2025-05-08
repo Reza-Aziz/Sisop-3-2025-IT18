@@ -10,7 +10,24 @@ Program ini terdiri dari dua file, yaitu:
   * hunter.c: Program client hunter untuk login, melihat dungeon, melakukan raid, dan bertarung antar hunter
 
 ## 4.1 system.c
-1. Struktur Data
+1. Header
+   <pre>
+    #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <time.h>
+
+#define MAX_HUNTERS 100
+#define MAX_DUNGEONS 100
+#define MAX_USERNAME 100
+#define MAX_NOTIFICATIONS 100
+   </pre>
+
+
+3. Struktur Data
 <pre>
 struct Hunter {
     char username[MAX_USERNAME];
