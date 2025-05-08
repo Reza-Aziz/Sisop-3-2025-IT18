@@ -1,7 +1,8 @@
 # Sisop-3-2025-IT18
 # Soal 1
+1. Import library
 <pre>
- #include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -12,6 +13,57 @@
 #include <fcntl.h>
 #include <time.h>
  </pre>
+ 
+2. Fungsi untuk mencatat aktivitas server ke file log.
+ <pre>
+void log_action(const char *msg) {
+    FILE *f = fopen(LOG_FILE, "a");
+    if (!f) return;
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+    char ts[20];
+    strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", tm);
+    fprintf(f, "[%s] %s\n", ts, msg);
+    fclose(f);
+}
+ </pre>
+*Membuka file log dengan mode append ("a")
+*Mendapatkan waktu saat ini dan memformatnya
+*Menulis pesan log dengan format: [timestamp] pesan
+*Menutup file log setelah selesai
+
+3. Fungsi untuk mengubah proses menjadi daemon (berjalan di background).
+<pre>
+ void daemonize() {
+    pid_t pid = fork();
+    if (pid < 0) exit(EXIT_FAILURE);
+    if (pid > 0) exit(EXIT_SUCCESS);
+    if (setsid() < 0) exit(EXIT_FAILURE);
+    umask(0);
+}
+    </pre>
+
+<pre>
+ void receive_and_convert(int client_fd) {
+    char filename[256], buf[BUF_SIZE], logmsg[300];
+    int n = read(client_fd, filename, sizeof(filename));
+    if (n <= 0) return;
+    filename[n] = '\0';
+    snprintf(logmsg, sizeof(logmsg), "RECEIVED %s", filename);
+    log_action(logmsg);
+
+    mkdir(SAVE_DIR, 0755);
+    char path[512];
+    snprintf(path, sizeof(path), "%s%s", SAVE_DIR, filename);
+    FILE *fp = fopen(path, "wb"); if (!fp) return;
+    while ((n = read(client_fd, buf, BUF_SIZE)) > 0) {
+        fwrite(buf, 1, n, fp);
+        if (n < BUF_SIZE) break;
+    }
+    fclose(fp);
+               </pre>
+
+
 # Soal 2
 delivery_agent
 1. Import library 
