@@ -10,7 +10,7 @@ Program ini terdiri dari dua file, yaitu:
   * hunter.c: Program client hunter untuk login, melihat dungeon, melakukan raid, dan bertarung antar hunter
 
 ## 4.1 system.c
-1. Header
+1. Import Library dan Define Constant
    ```c
     #include <stdio.h>
     #include <stdlib.h>
@@ -61,7 +61,7 @@ Program ini terdiri dari dua file, yaitu:
    * struct Dungeon Menyimpan data dungeon beserta shared memory key unik
    * struct SystemData menyimpan semua informasi global dari sistem (hunters, dungeons, notifications)
 
-3. Fungsi Tampilkan Hunter
+3. Tampilkan Hunter
    <pre>
    void tampilkan_hunters() {
        printf("\n=== Daftar Hunter ===\n");
@@ -75,7 +75,7 @@ Program ini terdiri dari dua file, yaitu:
     * Melakukan loop semua hunter
     * Menampilkan data lengkapnya dan status active/banned
 
- 4. Fungsi Tampilkan Dungeon
+ 4. Tampilkan Dungeon
     <pre>
     void tampilkan_dungeons() {
         printf("\n=== Daftar Dungeon ===\n");
@@ -89,7 +89,7 @@ Program ini terdiri dari dua file, yaitu:
     * Melakukan loop semua dungeon
     * Menampilkan data lengkapnya
 
- 5. Fungsi Buat Dungeon
+ 5. Buat Dungeon
     <pre>
     void buat_dungeon() {
         if (system_data->num_dungeons >= MAX_DUNGEONS) {
@@ -124,6 +124,108 @@ Program ini terdiri dari dua file, yaitu:
     * Generate nilai-nilai stat secara acak
     * Tambahkan notifikasi dungeon baru
 
-    
-   
+ 6. Ban dan Unban Hunter
+    <pre>
+    void ban_hunter() {
+        tampilkan_hunters();
+        printf("Pilih nomor hunter yang akan diban: ");
+        int idx; scanf("%d", &idx); idx--;
 
+        if (idx >= 0 && idx < system_data->num_hunters) {
+            system_data->hunters[idx].banned = 1;
+            printf("Hunter %s telah diban.\n", system_data->hunters[idx].username);
+        } else {
+            printf("Indeks tidak valid.\n");
+        }
+    }
+
+    void unban_hunter() {
+        tampilkan_hunters();
+        printf("Pilih nomor hunter yang akan diunban: ");
+        int idx; scanf("%d", &idx); idx--;
+
+        if (idx >= 0 && idx < system_data->num_hunters) {
+            system_data->hunters[idx].banned = 0;
+            printf("Hunter %s telah diunban.\n", system_data->hunters[idx].username);
+        } else {
+            printf("Indeks tidak valid.\n");
+        }
+    }
+    </pre>
+    * Input nomor hunter lalu ubah statusnya banned/acticve
+    * Unban juga sama tapi set banned = 0
+
+ 7. Reset Stat Hunter
+    <pre>
+    void reset_hunter_stat() {
+        tampilkan_hunters();
+        printf("Pilih nomor hunter yang akan direset: ");
+        int idx; scanf("%d", &idx); idx--;
+
+        if (idx >= 0 && idx < system_data->num_hunters) {
+            struct Hunter *h = &system_data->hunters[idx];
+            h->level = 1;
+            h->exp = 0;
+            h->atk = 10;
+            h->hp = 100;
+            h->def = 5;
+            printf("Stat hunter %s telah direset.\n", h->username);
+        } else {
+            printf("Indeks tidak valid.\n");
+        }
+    }
+    </pre>
+    * Kembalikan semua nilai ke  default/stat awal
+
+ 8. Fungsi main
+    <pre>
+    int main() {
+        key_t key = get_system_key();
+        int shmid = shmget(key, sizeof(struct SystemData), IPC_CREAT | 0666);
+        if (shmid == -1) {
+            perror("shmget");
+            exit(1);
+        }
+
+        system_data = (struct SystemData *) shmat(shmid, NULL, 0);
+        if (system_data == (void *) -1) {
+            perror("shmat");
+            exit(1);
+        }
+
+        srand(time(NULL));
+
+        if (system_data->num_hunters == 0 && system_data->num_dungeons == 0 && system_data->current_notification_index == 0>  memset(system_data, 0, sizeof(struct   SystemData));
+        }
+
+        int choice;
+        do {
+            printf("\n=== Menu System ===\n");
+            printf("1. Lihat Hunter\n");
+            printf("2. Lihat Dungeon\n");
+            printf("3. Buat Dungeon\n");
+            printf("4. Ban Hunter\n");
+            printf("5. Unban Hunter\n");
+            printf("6. Reset Hunter Stat\n");
+            printf("7. Exit\n");
+            printf("Pilihan: ");
+            scanf("%d", &choice);
+
+            switch (choice) {
+                case 1: tampilkan_hunters(); break;
+                case 2: tampilkan_dungeons(); break;
+                case 3: buat_dungeon(); break;
+                case 4: ban_hunter(); break;
+                case 5: unban_hunter(); break;
+                case 6: reset_hunter_stat(); break;
+                case 7: return 0;
+                default: printf("Pilihan tidak valid.\n");
+            }
+        } while (1);
+
+        return 0;
+    }
+    </pre>
+    * Akses dan map shared memory
+    * Tampilkan menu admin
+    * Loop menu sistem hingga exit
