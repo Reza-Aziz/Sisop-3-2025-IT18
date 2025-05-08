@@ -25,7 +25,7 @@ Program ini terdiri dari dua file, yaitu:
     #define MAX_USERNAME 100
     #define MAX_NOTIFICATIONS 100
 
-2. Struktur Data
+ 2. Struktur Data
    <pre>
    struct Hunter {
       char username[MAX_USERNAME];
@@ -35,7 +35,31 @@ Program ini terdiri dari dua file, yaitu:
       int hp;
       int def;
       int banned;
-   }; </pre>
-* Struktur untuk menyimpan data statistik setiap hunter
-* Begitu juga dengan struct dungeon yang menimpan data dungeon beserta shared memory key unik
+   }; 
+   
+   struct Dungeon {
+       char name[100];
+       int min_level;
+       int exp;
+       int atk;
+       int hp;
+       int def;
+       key_t shm_key;
+   };
+
+   struct SystemData {
+       struct Hunter hunters[MAX_HUNTERS];
+       int num_hunters;
+
+       struct Dungeon dungeons[MAX_DUNGEONS];
+       int num_dungeons;
+
+       char notifications[MAX_NOTIFICATIONS][256];
+       int current_notification_index; </pre>
+   * struct Hunter menyimpan data statistik setiap hunter
+   * struct Dungeon Menyimpan data dungeon beserta shared memory key unik
+   * struct SystemData menyimpan semua informasi global dari sistem (hunters, dungeons, notifications)
+
+   3. Fungsi Tampilkan Hunter
+   
 
