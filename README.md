@@ -35,8 +35,7 @@ Program ini terdiri dari dua file, yaitu:
       int hp;
       int def;
       int banned;
-  }; 
-  </pre>
+   }; </pre>
 * Struktur untuk menyimpan data statistik setiap hunter
 * Begitu juga dengan struct dungeon yang menimpan data dungeon beserta shared memory key unik
 
