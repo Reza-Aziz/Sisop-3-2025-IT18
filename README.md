@@ -195,7 +195,7 @@ Program ini terdiri dari dua file, yaitu:
 
         srand(time(NULL));
 
-        if (system_data->num_hunters == 0 && system_data->num_dungeons == 0 && system_data->current_notification_index == 0>  memset(system_data, 0, sizeof(struct   SystemData));
+        if (system_data->num_hunters == 0 && system_data->num_dungeons == 0 && system_data->current_notification_index == 0> memset(system_data, 0, sizeof(struct SystemData));
         }
 
         int choice;
