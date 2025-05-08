@@ -13,31 +13,29 @@ Program ini terdiri dari dua file, yaitu:
 1. Header
    <pre>
     #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <time.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <unistd.h>
+    #include <sys/ipc.h>
+    #include <sys/shm.h>
+    #include <time.h>
 
-#define MAX_HUNTERS 100
-#define MAX_DUNGEONS 100
-#define MAX_USERNAME 100
-#define MAX_NOTIFICATIONS 100
-   </pre>
+    #define MAX_HUNTERS 100
+    #define MAX_DUNGEONS 100
+    #define MAX_USERNAME 100
+    #define MAX_NOTIFICATIONS 100 </pre>
 
-
-3. Struktur Data
-<pre>
-struct Hunter {
-    char username[MAX_USERNAME];
-    int level;
-    int exp;
-    int atk;
-    int hp;
-    int def;
-    int banned;
-}; </pre>
+2. Struktur Data
+   <pre>
+   struct Hunter {
+      char username[MAX_USERNAME];
+      int level;
+      int exp;
+      int atk;
+      int hp;
+      int def;
+      int banned;
+  }; </pre>
 * Struktur untuk menyimpan data statistik setiap hunter
 * Begitu juga dengan struct dungeon yang menimpan data dungeon beserta shared memory key unik
 
