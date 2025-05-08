@@ -11,7 +11,7 @@ Program ini terdiri dari dua file, yaitu:
 
 ## 4.1 system.c
 1. Header
-   <pre>
+   ```c
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
@@ -23,7 +23,7 @@ Program ini terdiri dari dua file, yaitu:
     #define MAX_HUNTERS 100
     #define MAX_DUNGEONS 100
     #define MAX_USERNAME 100
-    #define MAX_NOTIFICATIONS 100 </pre>
+    #define MAX_NOTIFICATIONS 100
 
 2. Struktur Data
    <pre>
@@ -35,7 +35,8 @@ Program ini terdiri dari dua file, yaitu:
       int hp;
       int def;
       int banned;
-  }; </pre>
+  }; 
+  </pre>
 * Struktur untuk menyimpan data statistik setiap hunter
 * Begitu juga dengan struct dungeon yang menimpan data dungeon beserta shared memory key unik
 
