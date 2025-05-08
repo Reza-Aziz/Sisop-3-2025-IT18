@@ -223,9 +223,27 @@ Program ini terdiri dari dua file, yaitu:
             }
         } while (1);
 
+
+
         return 0;
     }
     </pre>
     * Akses dan map shared memory
     * Tampilkan menu admin
     * Loop menu sistem hingga exit
+
+## 4.2 hunter.c
+1. Import Library dan Define Constant
+   ```c
+   #include <stdio.h>
+   #include <stdlib.h>
+   #include <string.h>
+   #include <unistd.h>
+   #include <sys/ipc.h>
+   #include <sys/shm.h>
+   #include <pthread.h>
+
+   #define MAX_HUNTERS 100
+   #define MAX_DUNGEONS 100
+   #define MAX_USERNAME 100
+   #define MAX_NOTIFICATIONS 100
