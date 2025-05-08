@@ -8,3 +8,5 @@ Di dunia yang kacau, seorang hunter bernama Sung Jin Woo bereinkarnasi dan menja
 Program ini terdiri dari dua file, yaitu:
   * system.c: Program utama sebagai admin system yang mengelola hunter dan dungeon menggunakan shared memory.
   * hunter.c: Program client hunter untuk login, melihat dungeon, melakukan raid, dan bertarung antar hunter.
+
+##4.1 system.c
