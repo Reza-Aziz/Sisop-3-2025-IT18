@@ -27,10 +27,10 @@ void log_action(const char *msg) {
     fclose(f);
 }
  </pre>
-*Membuka file log dengan mode append ("a")
-*Mendapatkan waktu saat ini dan memformatnya
-*Menulis pesan log dengan format: [timestamp] pesan
-*Menutup file log setelah selesai
+* Membuka file log dengan mode append ("a")
+* Mendapatkan waktu saat ini dan memformatnya
+* Menulis pesan log dengan format: [timestamp] pesan
+* Menutup file log setelah selesai
 
 3. Fungsi untuk mengubah proses menjadi daemon (berjalan di background).
 <pre>
@@ -42,7 +42,7 @@ void log_action(const char *msg) {
     umask(0);
 }
     </pre>
-
+4. Fungsi utama yang menangani komunikasi dengan client.
 <pre>
  void receive_and_convert(int client_fd) {
     char filename[256], buf[BUF_SIZE], logmsg[300];
@@ -62,6 +62,7 @@ void log_action(const char *msg) {
     }
     fclose(fp);
                </pre>
+
 
 
 # Soal 2
