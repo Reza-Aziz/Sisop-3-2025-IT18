@@ -198,7 +198,7 @@ void send_file(int sock) {
 * Membaca isi file dan mengirimkannya ke server per chunk (BUF_SIZE)
 * Menutup file setelah selesai
 
-  5. Fungsi untuk menerima respons dari server.
+5. Fungsi untuk menerima respons dari server.
  <pre>
   void receive_response(int client_fd) {
     char resp[128];
@@ -222,7 +222,7 @@ void receive_response(int sock) {
 * Menambahkan null terminator pada string yang diterima
 * Mencetak respons server ke layar
 
-  6. Int main()
+6. Int main()
   <pre>
    int main() {
     int choice;
